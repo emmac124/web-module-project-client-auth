@@ -1,23 +1,55 @@
-import React from 'react'
+import React, { useState } from 'react';
+import { axiosWithAuth } from './../utils/axiosWithAuth';
+import { useHistory } from 'react-router-dom';
 
-function FriendForm() {
+const initialFormValues = {
+    name: '',
+    age: '',
+    email: '',
+}
+
+const FriendForm = () => {
+
+    const [formValues, setFormValues] = useState(initialFormValues);
+    const { push } = useHistory();
+
+    const handleChanges = (e) => {
+        setFormValues({
+            ...formValues,
+            [e.target.name]: e.target.value
+        })
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        axiosWithAuth()
+            .post('/api/friends', formValues)
+            .then(res => {
+                console.log(res);
+                push('/friends');
+            })
+            .catch(err => {
+                console.log({ err });
+            })
+    }
+
     return (
         <div>
-            <h4>Add New Friend</h4>
-            <form>
+            <h3>Add New Friend</h3>
+            <form onSubmit={handleSubmit}>
                 <div>
-                    <label>Name:</label>
-                    <input id="name" name='name' type='text' />
+                    <label htmlFor='name'>Name:</label>
+                    <input id="name" name='name' value={formValues.name} onChange={handleChanges} />
                 </div><br />
                 <div>
-                    <label>Email:</label>
-                    <input id="email" name='email' type='email' />
+                    <label htmlFor='email'>Email:</label>
+                    <input id="email" name='email' value={formValues.email} onChange={handleChanges} />
                 </div><br />
                 <div>
-                    <label>Age:</label>
-                    <input id="age" name='age' type='number' />
+                    <label htmlFor='age'>Age:</label>
+                    <input id="age" name='age' value={formValues.age} onChange={handleChanges} />
                 </div><br />
-                <button>Add New Friend </button>
+                <button>Add Friend</button>
             </form>
         </div>
     )
